@@ -1,93 +1,146 @@
 <?php
-		include_once("connection.php");
-		if(isset($_POST['btnAdd']))
+	require('requirelogin.php');
+	include_once("connection.php");
+	function bind_Category_List($conn) {
+		$sqlstring = "SELECT cat_id, cat_name from category";
+		$result = pg_query($conn, $sqlstring);
+		echo "<SELECT name='CategoryList' class='form-control'>
+			<option value='0'>Choose category</option>";
+			while ($row = pg_fetch_array($result, NULL, PGSQL_ASSOC)) {
+				echo "<option value='".$row['cat_id']."'>".$row['cat_name']."</option>";
+			}
+		echo "</select>";	
+		}
+
+		function bind_Store_List($conn) {
+			$sqlstring = "SELECT store_id, detail_address from public.store";
+			$result = pg_query($conn, $sqlstring);
+			echo "<SELECT name='StoreList' class='form-control'>
+				<option value='0'>Choose store</option>";
+				while ($row = pg_fetch_array($result, NULL, PGSQL_ASSOC)) {
+					echo "<option value='".$row['store_id']."'>".$row['detail_address']."</option>";
+				}
+			echo "</select>";	
+			}
+
+		if(isset($_POST["btnAdd"]))
 		{
-			$id = $_POST['txtID'];
-			$name = $_POST['txtName'];
-			$Address = $_POST['txtAddress'];
-			$phone = $_POST['txtPhone'];
-			$email = $_POST['txtEmail'];
-			$err = "";
-			if($id=="")
+			$id = $_POST["txtID"];
+			$id = htmlspecialchars(pg_escape_string($conn, $id));
+			$proname = $_POST['txtName'];
+			$proname = htmlspecialchars(pg_escape_string($conn, $proname));
+			$qty = $_POST['txtQty'];
+			$qty = htmlspecialchars(pg_escape_string($conn, $qty));
+			$price = $_POST['txtPrice'];
+			$price = htmlspecialchars(pg_escape_string($conn, $price));
+			$des = $_POST['txtDescription'];
+			$des = htmlspecialchars(pg_escape_string($conn, $des));
+			$category = $_POST['CategoryList'];
+			$category = htmlspecialchars(pg_escape_string($conn, $category));
+			$store = $_POST['StoreList'];
+			$store = htmlspecialchars(pg_escape_string($conn, $store));
+			$pic = $_FILES['txtImage'];
+			$err="";
+
+			if(trim($id)=="")
 			{
-				$err .= "Enter category ID</br>";
+				echo "<script>alert('Enter product ID please')</script>";
 			}
-			if($name=="")
+			elseif(trim($proname)=="")
 			{
-				$err .= "Enter category name</br>";
+				echo "<script>alert('Enter product name please')</script>";
 			}
-			if($Address=="")
+			elseif($category =="0")
 			{
-				$err .= "Enter address/br>";
+				echo "<script>alert('Choose category please')</script>";
 			}
-			if(!iS_number($phone)="")
+			elseif($store =="0")
 			{
-				$err .= "Enter phone</br>";
+				echo "<script>alert('Choose store please')</script>";
 			}
-			if($email=="")
+			elseif(!is_numeric($qty))
 			{
-				$err .= "Enter email</br>";
+				echo "<script>alert('Product quantity must be a number')</script>";
 			}
-			if($err != "")
-			{
-				echo $err;
+			elseif(!is_numeric($price)){
+				echo "<script>alert('Product price must be a number')</script>";
 			}
+			
 			else
 			{
-				$sql = "select * from shop where shop_id ='$id' and shop_name = '$name'";
-				$result = pg_query($conn, $sql);
-				if(pg_num_rows($result)=="0")
+				if($pic['type']=="image/jpg" || $pic['type']=="image/jpeg" || $pic['type']=="image/png"|| $pic['type']=="image/gif")
 				{
-					pg_query($conn, "insert into shop (shop_id, shop_name, address, phone, email) values ('$id', '$name','$Address','$phone','$email')");
-					echo '<meta http-equiv="refresh" content="0;URL =?page=shop_management"';
+					if ($pic['size'] <= 614400)
+					{
+						$sq = "SELECT * FROM public.product WHERE pro_id='$id' OR pro_name='$proname'";
+						$result = pg_query($conn, $sq);
+						
+						if(pg_num_rows($result)==0)
+						{
+							copy($pic['tmp_name'], "product_image/".$pic['name']);
+							$filePic = $pic['name'];
+							$sqlstring = "INSERT INTO product (pro_id, pro_name, pro_qty, price, pro_desc, cat_id, image, store_id)
+							VALUES('$id', '$proname', $qty, $price, '$des', '$category', '$filePic', '$store')";
+							pg_query($conn, $sqlstring);
+							echo '<meta http-equiv="refresh" content="0;URL=index.php?page=product"/>';
+						}
+						else
+						{
+							echo "<script>alert('Duplicate product ID')</script>";
+						}
+
+					}
+					else
+					{
+						echo "<script>alert('Size of the image too big')</script>";
+						
+					}
+
 				}
-				else
-				{
-					echo "Data duplicated";
+				else{
+					echo "<script>alert('Image format is not correct')</script>";
 				}
 			}
-		}
-	?>
-
+	}
+?>
 <div class="container">
-	<h2>Adding Category</h2>
-			 	<form id="form1" name="form1" method="post" action="" class="form-horizontal" role="form">
-				 <div class="form-group">
-						    <label for="txtTen" class="col-sm-2 control-label">Shop ID(*):  </label>
-							<div class="col-sm-10">
-							      <input type="text" name="txtID" id="txtID" class="form-control" placeholder="Category ID" value='<?php echo isset($_POST["txtID"])?($_POST["txtID"]):"";?>'>
-							</div>
-					</div>	
-				 <div class="form-group">
-						    <label for="txtTen" class="col-sm-2 control-label">Shop Name(*):  </label>
-							<div class="col-sm-10">
-							      <input type="text" name="txtName" id="txtName" class="form-control" placeholder="Category Name" value='<?php echo isset($_POST["txtName"])?($_POST["txtName"]):"";?>'>
-							</div>
-					</div>
-					<div class="form-group">
-						    <label for="txtTen" class="col-sm-2 control-label">Address(*):  </label>
-							<div class="col-sm-10">
-							      <input type="text" name="txtAddress" id="txtAddress" class="form-control" placeholder="Address" value='<?php echo isset($_POST["txtAddress"])?($_POST["txtAddress"]):"";?>'>
-							</div>
-					</div>
-                    <div class="form-group">
-						    <label for="txtTen" class="col-sm-2 control-label">Phone(*):  </label>
-							<div class="col-sm-10">
-							      <input type="text" name="txtPhone" id="txtPhone" class="form-control" placeholder="Phone" value='<?php echo isset($_POST["txtPhone"])?($_POST["txtPhone"]):"";?>'>
-							</div>
-					</div>
-					<div class="form-group">
-						    <label for="txtTen" class="col-sm-2 control-label">Email(*):  </label>
-							<div class="col-sm-10">
-							      <input type="text" name="txtEmail" id="txtEmail" class="form-control" placeholder="Email" value='<?php echo isset($_POST["txtEmail"])?($_POST["txtEmail"]):"";?>'>
-							</div>
-					</div>
-					<div class="form-group">
-						<div class="col-sm-offset-2 col-sm-10">
-						      <input type="submit"  class="site-btn" name="btnAdd" id="btnAdd" value="Add new"/>
-                              <input type="button" class="site-btn" name="btnIgnore"  id="btnIgnore" value="Ignore" onclick="window.location='?page=shop_management'" />
-                              	
-						</div>
-					</div>
-				</form>
+  <h2 align="center">Add new product</h2>
+  <form id="frmProduct" name="frmProduct" method="post" enctype="multipart/form-data" class="form-horizontal" role="form">
+    <div class="form-group">
+      <label>Product ID:</label>
+      <input type="text" name="txtID" id="txtID" class="form-control" placeholder="Enter product ID" value="" />
+    </div>
+    <div class="form-group">
+      <label>Product name:</label>
+      <input type="text" name="txtName" id="txtName" class="form-control" placeholder="Enter product name" value="" />
+    </div>
+    <div class="form-group">
+      <label>Quantity:</label>
+      <input type="text" name="txtQty" id="txtQty" class="form-control" placeholder="Enter quantity">
+    </div>
+    <div class="form-group">
+      <label>Price:</label>
+      <input type="text" name="txtPrice" id="txtPrice" id="txtFullname" class="form-control" id="" placeholder="Enter price">
+    </div>
+    <div class="form-group">
+      <label>Description:</label>
+      <input type="text" name="txtDescription" class="form-control" id="" placeholder="Enter description">
 	</div>
+    <div class="form-group">
+      <label>Product category:</label>
+        <?php bind_Category_List($conn); ?>
+    </div>
+
+	<div class="form-group">
+      <label>Store:</label>
+        <?php bind_Store_List($conn); ?>
+    </div>
+
+    <div class="form-group">
+      <label>Image:</label>
+      <input type="file" name="txtImage" id="txtImage" class="form-control" value=""/>
+    </div>
+    <button type="submit" class="btn btn-primary"  name="btnAdd" id="btnAdd">Submit</button>
+    <button type="button" class="btn btn-danger" name="" id="" onclick="window.location='index.php?page=product'">Cancel</button>
+  </form>
+</div>
