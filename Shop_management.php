@@ -56,7 +56,7 @@
               <td class="cotCheckBox"><?php echo $No; ?></td>
               <td><?php echo $row["shop_id"]; ?></td>
               <td><?php echo $row["shop_name"]; ?></td>
-              <td><?php echo $row["address"]; ?></td>
+              <td><?php echo $row["addres"]; ?></td>
               <td><?php echo $row["phone"]; ?></td>
               <td><?php echo $row["email"]; ?></td>
             </tr>
