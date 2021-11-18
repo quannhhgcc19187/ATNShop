@@ -23,9 +23,6 @@
             ?>
         <form name="frm" method="post" action="">
         <h1>Shop</h1>
-        <p>
-        <img src="images/add.png" alt="Add new" width="16" height="16" border="0" /> <a href="?page=addshop"> Add new</a>
-        </p>
         <table id="tableshop" class="table table-striped table-bordered" cellspacing="0" width="100%">
             
             <thead>
@@ -36,8 +33,6 @@
                     <th><strong>Address</strong></th>
                     <th><strong>Phone</strong></th>
                     <th><strong>Email</strong></th>
-                    <th><strong>Edit</strong></th>
-                    <th><strong>Delete</strong></th>
                 </tr>
              </thead>
 
@@ -64,9 +59,6 @@
               <td><?php echo $row["address"]; ?></td>
               <td><?php echo $row["phone"]; ?></td>
               <td><?php echo $row["email"]; ?></td>
-              <td style='text-align:center'><a href="?page=update_shop&&id=<?php echo $row["cat_id"]; ?>"><img src='images/edit.png' border='0'  /></a></td>
-              <td style='text-align:center'><a href="?page=shop_management&&function=del&&id=<?php echo $row["shop_id"]; ?>" onclick="return deleteConfirm()">
-              <img src='images/delete.png' border='0' /></a></td>
             </tr>
             <?php
                $No++;
