@@ -1,5 +1,4 @@
 <?php
-	require('requirelogin.php');
 	include_once("connection.php");
 	function bind_Category_List($conn) {
 		$sqlstring = "SELECT cat_id, cat_name from category";
@@ -12,7 +11,7 @@
 		echo "</select>";	
 		}
 
-		function bind_Shp[_List($conn) {
+		function bind_Shop_List($conn) {
 			$sqlstring = "SELECT shop_id, shop_name from shop";
 			$result = pg_query($conn, $sqlstring);
 			echo "<SELECT name='StoreList' class='form-control'>
@@ -79,7 +78,7 @@
 						{
 							copy($pic['tmp_name'], "product_image/".$pic['name']);
 							$filePic = $pic['name'];
-							$sqlstring = "INSERT INTO product (pro_id, pro_name, pro_qty, price, pro_desc, cat_id, pro_image, shop_id)
+							$sqlstring = "INSERT INTO product (product_id, product_name, pro_qty, price, pro_desc, cat_id, pro_image, shop_id)
 							VALUES('$id', '$proname', $qty, $price, '$des', '$category', '$filePic', '$store')";
 							pg_query($conn, $sqlstring);
 							echo '<meta http-equiv="refresh" content="0;URL=index.php?page=product"/>';
