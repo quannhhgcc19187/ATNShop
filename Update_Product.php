@@ -28,12 +28,12 @@ echo "</select>";
     include_once("connection.php");
     if(isset($_GET["id"])){
         $id=$_GET["id"];
-        $sqlstring ="SELECT product_name, product_qty, price, pro_desc, cat_id, image  FROM product where pro_id='$id'";
+        $sqlstring ="SELECT product_name, pro_qty, price, detaildesc, cat_id, image  FROM public.product where product_id='$id'";
 
         $result=pg_query($conn, $sqlstring);
         $row=pg_fetch_array($result, NULL, PGSQL_ASSOC);
 
-        $proname=$row["pro_name"];
+        $proname=$row["product_name"];
         $qty=$row['pro_qty'];
         $price=$row['price'];
 		$des=$row['pro_desc'];
@@ -81,7 +81,7 @@ echo "</select>";
                         $result = pg_query($conn,$sq);
                         if(pg_num_rows($result)==0)
                         {
-                            copy($pic['tmp_name'],"pro_image/".$pic['name']);
+                            copy($pic['tmp_name'],"product_image/".$pic['name']);
                             $filePic=$pic['name'];
 
                             $sqlstring="UPDATE product SET product_name='$proname', pro_qty=$qty, price=$price, 
@@ -106,7 +106,7 @@ echo "</select>";
                 if(pg_num_rows($result)==0)
                 {
                     $sqlstring="UPDATE product SET product_name='$proname', pro_qty=$qty, price=$price, 
-					pro_desc='$des', cat_id = '$category' WHERE pro_id='$id'";
+					detaildesc='$des', cat_id = '$category' WHERE product_id='$id'";
                     pg_query($conn,$sqlstring);
                     echo '<meta http-equiv="refresh" content="0; URL=index.php?page=product"/>';
                 }
@@ -153,6 +153,6 @@ echo "</select>";
 <?php	
 	}
     else{
-        echo '<meta http-equiv="refresh" content="0; URL=index.php?page=product"/>';
+        echo '<meta http-equiv="refresh" content="0; URL=index.php?page=manage_product"/>';
     }
 ?>

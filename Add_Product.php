@@ -81,7 +81,7 @@
 							$sqlstring = "INSERT INTO product (product_id, product_name, pro_qty, price, pro_desc, cat_id, pro_image, shop_id)
 							VALUES('$id', '$proname', $qty, $price, '$des', '$category', '$filePic', '$store')";
 							pg_query($conn, $sqlstring);
-							echo '<meta http-equiv="refresh" content="0;URL=index.php?page=product"/>';
+							echo '<meta http-equiv="refresh" content="0;URL=index.php?page=management_product"/>';
 						}
 						else
 						{
@@ -140,6 +140,6 @@
       <input type="file" name="txtImage" id="txtImage" class="form-control" value=""/>
     </div>
     <button type="submit" class="btn btn-primary"  name="btnAdd" id="btnAdd">Submit</button>
-    <button type="button" class="btn btn-danger" name="" id="" onclick="window.location='index.php?page=product'">Cancel</button>
+    <button type="button" class="btn btn-danger" name="" id="" onclick="window.location='index.php?page=management_product'">Cancel</button>
   </form>
 </div>
